@@ -14,7 +14,11 @@ export const getCurrentProfile = async (req: Request, res: Response) => {
     const userFromHeaders = authHeaderUser.split(" ")[1];
     console.log("userIdFromHeaders", userFromHeaders);
 
-    const secret = "Secret-key";
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error("JWT secret is not defined");
+    }
+
     const decoded = jwt.verify(userFromHeaders, secret) as JwtPayload;
     console.log("decoded: ", decoded.UserData);
 

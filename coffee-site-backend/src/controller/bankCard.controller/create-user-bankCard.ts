@@ -1,26 +1,26 @@
 import { Response, Request } from "express";
 import { prisma } from "../../utils/prisma";
 
-function isValidCardNumber(cardNumber: string): boolean {
-  if (!/^\d{16}$/.test(cardNumber)) return false;
+// function isValidCardNumber(cardNumber: string): boolean {
+//   if (!/^\d{16}$/.test(cardNumber)) return false;
 
-  let sum = 0;
-  let shouldDouble = false;
+//   let sum = 0;
+//   let shouldDouble = false;
 
-  for (let i = cardNumber.length - 1; i >= 0; i--) {
-    let digit = parseInt(cardNumber[i], 10);
+//   for (let i = cardNumber.length - 1; i >= 0; i--) {
+//     let digit = parseInt(cardNumber[i], 10);
 
-    if (shouldDouble) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
+//     if (shouldDouble) {
+//       digit *= 2;
+//       if (digit > 9) digit -= 9;
+//     }
 
-    sum += digit;
-    shouldDouble = !shouldDouble;
-  }
+//     sum += digit;
+//     shouldDouble = !shouldDouble;
+//   }
 
-  return sum % 10 === 0;
-}
+//   return sum % 10 === 0;
+// }
 
 export const createUserBankCard = async (req: Request, res: Response) => {
   const { country, firstName, lastName, cardNumber, expiryDate } = req.body;

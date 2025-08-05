@@ -23,7 +23,11 @@ export const SignIn = async (req: Request, res: Response) => {
         email: user?.email,
         username: user?.username,
       };
-      const secret = "Secret-key";
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        throw new Error("JWT secret is not defined");
+      }
+
       const hour = Math.floor(Date.now() / 1000) * 60 * 60;
 
       const accesstoken = jwt.sign({ exp: hour, UserData }, secret);
