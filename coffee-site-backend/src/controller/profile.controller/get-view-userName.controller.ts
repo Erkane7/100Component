@@ -1,21 +1,25 @@
 import { Response, Request } from "express";
 import { prisma } from "../../utils/prisma";
+import { AuthRequest } from "../../middleware/authToken";
 
-export const getUserProfile = async (req: Request, res: Response) => {
+export const getUserProfile = async (req: AuthRequest, res: Response) => {
   try {
     const { username } = req.params;
-    console.log("username", username);
+    const userId = req.user?.userId;
+
+    console.log("Authenticated userId:", userId);
+
     const profile = await prisma.user.findUnique({
-      where: {
-        username,
-      },
+      where: { username },
     });
 
-    console.log("prfile :", profile);
+    if (!profile) {
+      return res.status(404).json({ message: "User profile not found." });
+    }
 
-    res.status(200).json({ profile });
+    res.status(200).json({ userProfile: profile });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

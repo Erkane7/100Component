@@ -1,37 +1,25 @@
-import { Response, Request } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { Response } from "express";
 import { prisma } from "../../utils/prisma";
+import { AuthRequest } from "../../middleware/authToken";
 
-export const getCurrentProfile = async (req: Request, res: Response) => {
+export const getCurrentProfile = async (req: AuthRequest, res: Response) => {
   try {
-    const authHeaderUser = req.headers.authorization || "";
+    const userId = req.user?.userId;
 
-    if (!authHeaderUser || !authHeaderUser.startsWith("Bearer ")) {
-      res.status(400).json({ success: false });
-      return;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const userFromHeaders = authHeaderUser.split(" ")[1];
-    console.log("userIdFromHeaders", userFromHeaders);
-
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      throw new Error("JWT secret is not defined");
-    }
-
-    const decoded = jwt.verify(userFromHeaders, secret) as JwtPayload;
-    console.log("decoded: ", decoded.UserData);
-
-    const user = await prisma.user.findUnique({
-      where: { id: decoded?.UserData?.user },
+    const user = await prisma.user.findFirst({
+      where: { id: parseInt(userId) },
     });
 
     if (!user) {
-      res.status(400).json({ message: "No user info in request" });
+      return res.status(404).json({ message: "User not found" });
     }
-    console.log(user);
-    res.status(200).json({ user });
+
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error: "Something went wrong", details: error });
   }
 };
