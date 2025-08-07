@@ -14,7 +14,6 @@ const port = process.env.PORT || 4202;
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use("/users", userRouter);
 app.use("/profile", profileRouter);
 app.use("/donation", donationRouter);
